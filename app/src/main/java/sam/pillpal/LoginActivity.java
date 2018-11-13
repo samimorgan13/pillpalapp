@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import sam.pillpal.models.CalendarActivity;
 import sam.pillpal.models.InputValidation;
 import sam.pillpal.models.DatabaseHelper;
 
@@ -122,14 +123,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
         if (databaseHelper.checkUser(emailEditable.toString().trim()
                 , passwordEditable.toString().trim())) {
-
-
-           /** Intent accountsIntent = new Intent(activity, UsersListActivity.class);
-            * accountsIntent.putExtra("EMAIL", textInputEditTextEmail.getText().toString().trim());
-            * emptyInputEditText();
-            * startActivity(accountsIntent); */
-
-
+           Intent accountsIntent = new Intent(activity, CalendarActivity.class);
+           accountsIntent.putExtra("EMAIL", textInputEditTextEmail.getText().toString().trim());
+           emptyInputEditText();
+           startActivity(accountsIntent);
         } else {
             // Snack Bar to show success message that record is wrong
             Snackbar snackbar =

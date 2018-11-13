@@ -145,13 +145,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             databaseHelper.addUser(user);
 
             // Snack Bar to show success message that record saved successfully
-            Snackbar.make(nestedScrollView, getString(R.string.success_message), Snackbar.LENGTH_LONG).show();
+            Snackbar snackbar = Snackbar.make(nestedScrollView, getString(R.string.success_message), Snackbar.LENGTH_LONG);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorTextHint));
+            snackbar.show();
             emptyInputEditText();
 
 
         } else {
             // Snack Bar to show error message that record already exists
-            Snackbar.make(nestedScrollView, getString(R.string.error_email_exists), Snackbar.LENGTH_LONG).show();
+            Snackbar snackbar = Snackbar.make(nestedScrollView, getString(R.string.error_email_exists), Snackbar.LENGTH_LONG);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorTextHint));
+            snackbar.show();
         }
 
 
