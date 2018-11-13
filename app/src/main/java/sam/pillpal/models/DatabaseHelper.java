@@ -7,16 +7,20 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import sam.pillpal.models.database_contracts.MedicationContract;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Database Name
-    private static final String DATABASE_NAME = "UserManager.db";
+    private static final String DATABASE_NAME = "pill_pal.db";
 
     // User table name
     private static final String TABLE_USER = "user";
@@ -34,6 +38,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // drop table sql query
     private String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + TABLE_USER;
+    private MedicationContract.MedicationDbHelper medicationDbHelper = null;
 
     /**
      * Constructor
@@ -42,13 +47,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        medicationDbHelper = new MedicationContract.MedicationDbHelper(context, DATABASE_VERSION, DATABASE_NAME);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_USER_TABLE);
+        medicationDbHelper.onCreate(db);
+        medicationDbHelper.insertMedication(1,"pill","2", "test", (new GregorianCalendar(2018, Calendar.NOVEMBER, 13)).getTime());
     }
 
+    public MedicationContract.MedicationDbHelper getMedicationDbHelper() {
+        return medicationDbHelper;
+    }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -58,7 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Create tables again
         onCreate(db);
-
+        medicationDbHelper.onUpgrade(db, oldVersion, newVersion);
     }
 
     /**
