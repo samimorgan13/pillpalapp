@@ -27,7 +27,7 @@
             android:name=".RegisterActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".models.CalendarActivity"
+            android:name=".CalendarActivity"
             android:screenOrientation="portrait" />
     </application>
 

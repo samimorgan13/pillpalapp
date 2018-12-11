@@ -54,7 +54,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_USER_TABLE);
         medicationDbHelper.onCreate(db);
-        medicationDbHelper.insertMedication(1,"pill","2", "test", (new GregorianCalendar(2018, Calendar.NOVEMBER, 13)).getTime());
+        // medicationDbHelper.insertMedication("pill","2", "test", (new GregorianCalendar(2018, Calendar.NOVEMBER, 13)).getTime());
     }
 
     public MedicationContract.MedicationDbHelper getMedicationDbHelper() {

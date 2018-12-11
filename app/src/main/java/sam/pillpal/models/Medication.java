@@ -1,5 +1,7 @@
 package sam.pillpal.models;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Medication {
@@ -15,6 +17,19 @@ public class Medication {
         this.dosage = dosage;
         this.instructions = instructions;
         this.refillDate = refillDate;
-
     }
+     public String getName(){
+        return this.name;
+     }
+     public String getDosage(){
+        return this.dosage;
+     }
+     public String getRefillDate(){
+        // TODO localization
+         DateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy hh:mm:ss");
+         String strDate = dateFormat.format(this.refillDate);
+        return strDate;
+     }
 }
+
+

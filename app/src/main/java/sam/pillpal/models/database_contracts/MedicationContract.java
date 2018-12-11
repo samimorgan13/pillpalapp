@@ -13,6 +13,8 @@ import java.util.List;
 
 import sam.pillpal.models.Medication;
 
+import static sam.pillpal.models.database_contracts.MedicationContract.MedicationRow.TABLE_NAME;
+
 public final class MedicationContract {
     private MedicationContract() {}
 
@@ -26,10 +28,10 @@ public final class MedicationContract {
 
     public static class MedicationDbHelper extends SQLiteOpenHelper {
         private static final String SQL_CREATE_MEDICATIONS =
-                "CREATE TABLE " + MedicationRow.TABLE_NAME + "(" + MedicationRow._ID + " INTEGER PRIMARY KEY," +
+                "CREATE TABLE " + TABLE_NAME + "(" + MedicationRow._ID + " INTEGER PRIMARY KEY," +
                         MedicationRow.COLUMN_NAME_NAME + " TEXT," + MedicationRow.COLUMN_NAME_DOSAGE + " TEXT," +
                         MedicationRow.COLUMN_NAME_INSTRUCTIONS + " TEXT," + MedicationRow.COLUMN_NAME_REFILL_DATE + " DATETIME)";
-        private static final String SQL_DELETE_MEDICATIONS = "DROP TABLE IF EXISTS " + MedicationRow.TABLE_NAME;
+        private static final String SQL_DELETE_MEDICATIONS = "DROP TABLE IF EXISTS " + TABLE_NAME;
         private int databaseVerison = 0;
         private String databaseName = "";
 
@@ -50,8 +52,8 @@ public final class MedicationContract {
         }
         public List<Medication> getMedications() {
             SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.query(MedicationRow.TABLE_NAME, null,null, null, null, null, null);
-            List medications = new ArrayList<Medication>();
+            Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+            List<Medication> medications = new ArrayList<>();
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(cursor.getColumnIndexOrThrow(MedicationRow._ID));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow(MedicationRow.COLUMN_NAME_NAME));
@@ -60,16 +62,17 @@ public final class MedicationContract {
                 Date refillDate = new Date(cursor.getLong(cursor.getColumnIndexOrThrow(MedicationRow.COLUMN_NAME_REFILL_DATE)));
                 medications.add(new Medication(id, name, dosage, instructions, refillDate));
             }
+            cursor.close();
             return medications;
         }
-        public void insertMedication(long id, String name, String dosage, String instructions, Date refillDate){
+        public void insertMedication(String name, String dosage, String instructions, Date refillDate){
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(MedicationRow.COLUMN_NAME_NAME, name);
             values.put(MedicationRow.COLUMN_NAME_DOSAGE, dosage);
             values.put(MedicationRow.COLUMN_NAME_INSTRUCTIONS, instructions);
             values.put(MedicationRow.COLUMN_NAME_REFILL_DATE, refillDate.getTime());
-            db.insert(MedicationRow.TABLE_NAME, null, values);
+            db.insert(TABLE_NAME, null, values);
         }
     }
 }

@@ -13,7 +13,6 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import sam.pillpal.models.CalendarActivity;
 import sam.pillpal.models.InputValidation;
 import sam.pillpal.models.DatabaseHelper;
 
