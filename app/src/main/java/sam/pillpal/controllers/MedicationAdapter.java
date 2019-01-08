@@ -69,4 +69,9 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         Log.d("Medication",mDataset.toString());
     }
 
+    public void resetDataSet() {
+        mDataset = (new DatabaseHelper(mContext)).getMedicationDbHelper().getMedications();
+        this.notifyDataSetChanged();
+    }
+
 }

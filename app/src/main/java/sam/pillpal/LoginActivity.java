@@ -46,6 +46,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         initViews();
         initListeners();
         initObjects();
+        textInputEditTextEmail.setText("sam@gmail.com");// TODO delete after tested
+        textInputEditTextPassword.setText("hi"); // TODO delete after tested
     }
 
     /**
@@ -115,6 +117,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (inputValidation.isInputEditTextEmpty(textInputEditTextPassword, textInputLayoutPassword, getString(R.string.error_message_password))) {
             return;
         }
+
         Editable emailEditable = textInputEditTextEmail.getText();
         Editable passwordEditable = textInputEditTextPassword.getText();
         if (emailEditable == null || passwordEditable == null)  {
@@ -123,7 +126,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (databaseHelper.checkUser(emailEditable.toString().trim()
                 , passwordEditable.toString().trim())) {
            Intent accountsIntent = new Intent(activity, CalendarActivity.class);
-           accountsIntent.putExtra("EMAIL", textInputEditTextEmail.getText().toString().trim());
+           accountsIntent.putExtra("EMAIL", "sam@gmail.com"); //textInputEditTextEmail.getText().toString().trim());
            emptyInputEditText();
            startActivity(accountsIntent);
         } else {
