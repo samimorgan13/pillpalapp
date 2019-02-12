@@ -6,4 +6,5 @@
     <color name="colorBackground">#5fa</color>
     <color name="colorText">#000000</color>
     <color name="colorTextHint">#ffffff</color>
+    <color name="colorDialogHint">#696969</color>
 </resources>

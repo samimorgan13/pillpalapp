@@ -34,4 +34,13 @@
     <string name="add_medication_title">Add Medication</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="med_name">Medication Name</string>
+    <string-array name="freq_array">
+        <item>Hourly</item>
+        <item>Daily</item>
+        <item>Weekly</item>
+    </string-array>
+    <string name="medication_name">Name:</string>
+    <string name="dosage_number">Dosage:</string>
+    <string name="frequency">Frequency:</string>
 </resources>
