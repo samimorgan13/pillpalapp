@@ -50,6 +50,7 @@ public final class MedicationContract {
             onCreate(db);
 
         }
+
         public List<Medication> getMedications() {
             SQLiteDatabase db = this.getReadableDatabase();
             Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
@@ -65,14 +66,34 @@ public final class MedicationContract {
             cursor.close();
             return medications;
         }
-        public void insertMedication(String name, String dosage, String instructions, Date refillDate){
+
+        public Medication getMedication(long medicationId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = db.rawQuery("SELECT * FROM " +
+                    MedicationContract.MedicationRow.TABLE_NAME + "WHERE " +
+                    String.valueOf(medicationId), null);
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(
+                    MedicationContract.MedicationRow._ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(
+                    MedicationContract.MedicationRow.COLUMN_NAME_NAME));
+            String dosage = cursor.getString(cursor.getColumnIndexOrThrow(
+                    MedicationContract.MedicationRow.COLUMN_NAME_DOSAGE));
+            String instructions = cursor.getString(cursor.getColumnIndexOrThrow(
+                    MedicationContract.MedicationRow.COLUMN_NAME_INSTRUCTIONS));
+            Date refillDate = new Date(cursor.getLong(cursor.getColumnIndexOrThrow(
+                    MedicationContract.MedicationRow.COLUMN_NAME_REFILL_DATE)));
+            cursor.close();
+            return new Medication(id, name, dosage, instructions, refillDate);
+        }
+
+        public long insertMedication(String name, String dosage, String instructions, Date refillDate) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(MedicationRow.COLUMN_NAME_NAME, name);
             values.put(MedicationRow.COLUMN_NAME_DOSAGE, dosage);
             values.put(MedicationRow.COLUMN_NAME_INSTRUCTIONS, instructions);
             values.put(MedicationRow.COLUMN_NAME_REFILL_DATE, refillDate.getTime());
-            db.insert(TABLE_NAME, null, values);
+            return db.insert(TABLE_NAME, null, values);
         }
     }
 }

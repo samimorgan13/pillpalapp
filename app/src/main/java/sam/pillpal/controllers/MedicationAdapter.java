@@ -59,7 +59,7 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         void bindData(Medication med){
             mNameTextView.setText(med.getName());
             mTextViewDosage.setText(med.getDosage());
-            mTextViewRefillDate.setText(med.getRefillDate());
+            mTextViewRefillDate.setText(med.getRefillDate() + " UTC");
         }
     }
 

@@ -26,7 +26,7 @@ public class Medication {
      }
      public String getRefillDate(){
         // TODO localization
-         DateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy hh:mm:ss");
+         DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm");
          String strDate = dateFormat.format(this.refillDate);
         return strDate;
      }

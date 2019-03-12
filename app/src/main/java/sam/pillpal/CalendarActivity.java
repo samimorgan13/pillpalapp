@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
@@ -57,15 +58,54 @@ public class CalendarActivity extends AppCompatActivity {
             String medicationName = this.medName.getText().toString();
             int dosageNum = this.dosage.getValue();
             String dosageString = String.valueOf(dosageNum);
-            Calendar cal = GregorianCalendar.getInstance();
+            Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(this.originalDate);
-            cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DATE));
-            cal.setTimeInMillis(this.timePicker.getDrawingTime());
-            Date date = new Date(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
-                    cal.get(Calendar.DATE), cal.get(Calendar.HOUR), cal.get(Calendar.MINUTE));
-            databaseHelper.getMedicationDbHelper().insertMedication(medicationName,dosageString,
-                    "test", date);
+            Date date = cal.getTime();
+            cal.set(date.getYear() + 1900, date.getMonth(), date.getDate(), timePicker.getCurrentHour(),
+                    timePicker.getCurrentMinute());
+            long id = databaseHelper.getMedicationDbHelper().insertMedication(medicationName, dosageString,
+                    "test", cal.getTime());
+            generateApplicationsForDate(id, Calendar.getInstance(), cal, (String)freqSpinner.getSelectedItem());
             ((CalendarActivity) getActivity()).refreshRecyclerInserted();
+        }
+
+        private void generateApplicationsForDate(long medicationId, Calendar currDate,
+                                                 Calendar endDate, String frequency) {
+            // Constants for Calculations
+            int millisInSec = 1000;
+            int secondsInMin = 60;
+            int minutesInHour = 60;
+            int hoursInDay = 24;
+
+            // Current Date, Calculation Date, and End Date converted to milliseconds since Jan 1, 1970
+            long currDateInMillis = currDate.getTimeInMillis();
+            long calcDateInMillis = currDateInMillis;
+            long endDateInMillis = endDate.getTimeInMillis();
+
+            // Calculating the NUMBER of DAYS from currDateInMillis to endDateInMillis (and converting
+            // to an integer as safely as we can
+            long diffInMillis = endDateInMillis - currDateInMillis;
+            long diffInSeconds = diffInMillis / millisInSec;
+            long diffInMinutes = diffInSeconds / secondsInMin;
+            long diffInHours = diffInMinutes / minutesInHour;
+            long diffInDays = diffInHours / hoursInDay;
+            int daysAway = 0;
+            if (diffInDays > Integer.MAX_VALUE) {
+                daysAway = Integer.MAX_VALUE;
+            } else if (diffInDays < Integer.MIN_VALUE) {
+                daysAway = Integer.MIN_VALUE;
+            } else {
+                daysAway = (int) diffInDays;
+            }
+
+            // FOR the number of days we calculated previously, we insert an application row to the
+            // database.
+            for (int i = 0; i < daysAway; i = i + 1) {
+                calcDateInMillis = calcDateInMillis + (millisInSec * secondsInMin * minutesInHour *
+                        hoursInDay);
+                databaseHelper.getApplicationDbHelper().insertApplication(medicationId,
+                        calcDateInMillis);
+            }
         }
 
         @Override
@@ -163,6 +203,7 @@ public class CalendarActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private MedicationAdapter mAdapter;
     private DatabaseHelper databaseHelper;
+    private long curDate;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -172,6 +213,16 @@ public class CalendarActivity extends AppCompatActivity {
         initViews();
         initObjects();
 
+        CalendarView.OnDateChangeListener list = new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+                Calendar cal = Calendar.getInstance();
+                cal.set(year, month, dayOfMonth);
+                curDate = cal.getTimeInMillis();
+            }
+        };
+        mCalendarView.setOnDateChangeListener(list);
+
     }
 
     /**
@@ -179,7 +230,7 @@ public class CalendarActivity extends AppCompatActivity {
      */
     private void initViews() {
         mCalendarView = findViewById(R.id.calendarView);
-
+        curDate = CalendarActivity.this.mCalendarView.getDate();
         mRecyclerViewMedications = findViewById(R.id.recyclerViewMedications);
         mRecyclerViewMedications.setHasFixedSize(true);
 
@@ -192,9 +243,10 @@ public class CalendarActivity extends AppCompatActivity {
             public void onClick(View v) {
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 Bundle data = new Bundle();
-                data.putLong(CalendarActivity.DATE_KEY, CalendarActivity.this.mCalendarView.getDate());
+                data.putLong(CalendarActivity.DATE_KEY, curDate);
                 AddMedicationDialogFragment fragment = new AddMedicationDialogFragment();
                 fragment.setArguments(data);
+                System.err.println("TEST2: " + curDate);
                 (fragment).show(fragmentManager, "addMedication");
             }
         });

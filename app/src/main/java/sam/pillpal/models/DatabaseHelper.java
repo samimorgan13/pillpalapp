@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import sam.pillpal.models.database_contracts.ApplicationContract;
 import sam.pillpal.models.database_contracts.MedicationContract;
 
 
@@ -39,6 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // drop table sql query
     private String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + TABLE_USER;
     private MedicationContract.MedicationDbHelper medicationDbHelper = null;
+    private ApplicationContract.ApplicationDbHelper applicationDbHelper = null;
 
     /**
      * Constructor
@@ -47,18 +49,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        medicationDbHelper = new MedicationContract.MedicationDbHelper(context, DATABASE_VERSION, DATABASE_NAME);
+        medicationDbHelper = new MedicationContract.MedicationDbHelper(context, DATABASE_VERSION,
+                DATABASE_NAME);
+        applicationDbHelper = new ApplicationContract.ApplicationDbHelper(context, DATABASE_VERSION,
+                DATABASE_NAME);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_USER_TABLE);
         medicationDbHelper.onCreate(db);
+        applicationDbHelper.onCreate(db);
         // medicationDbHelper.insertMedication("pill","2", "test", (new GregorianCalendar(2018, Calendar.NOVEMBER, 13)).getTime());
     }
 
     public MedicationContract.MedicationDbHelper getMedicationDbHelper() {
         return medicationDbHelper;
+    }
+
+    public ApplicationContract.ApplicationDbHelper getApplicationDbHelper() {
+        return applicationDbHelper;
     }
 
     @Override
@@ -70,6 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Create tables again
         onCreate(db);
         medicationDbHelper.onUpgrade(db, oldVersion, newVersion);
+        applicationDbHelper.onUpgrade(db, oldVersion, newVersion);
     }
 
     /**
