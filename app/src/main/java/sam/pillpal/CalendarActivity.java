@@ -1,26 +1,23 @@
 package sam.pillpal;
 
-
-import android.app.ActionBar;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,18 +33,11 @@ import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
-
-import sam.pillpal.R;
 import sam.pillpal.controllers.MedicationAdapter;
 import sam.pillpal.models.DatabaseHelper;
-import sam.pillpal.models.Medication;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+import sam.pillpal.AlarmReceiver;
 
 public class CalendarActivity extends AppCompatActivity {
 
@@ -62,7 +52,7 @@ public class CalendarActivity extends AppCompatActivity {
         private TimePicker timePicker = null;
         private long originalDate = 0;
 
-        private void createObjectFromDialog(){
+        private void createObjectFromDialog() {
             String medicationName = this.medName.getText().toString();
             int dosageNum = this.dosage.getValue();
             String dosageString = String.valueOf(dosageNum);
@@ -73,10 +63,14 @@ public class CalendarActivity extends AppCompatActivity {
                     timePicker.getCurrentMinute());
             long id = databaseHelper.getMedicationDbHelper().insertMedication(medicationName, dosageString,
                     "test", cal.getTime());
-            generateApplicationsForDate(id, Calendar.getInstance(), cal, (String)freqSpinner.getSelectedItem());
+            generateApplicationsForDate(id, Calendar.getInstance(), cal, (String) freqSpinner.getSelectedItem());
             ((CalendarActivity) getActivity()).refreshRecyclerInserted();
 
-            ((CalendarActivity) getActivity()).showNotification(medicationName, dosageString);
+            String units = " pill";
+            if (dosageNum != 1) units += "s";
+
+//            ((CalendarActivity) getActivity()).showNotification(medicationName, dosageString + units);
+            ((CalendarActivity) getActivity()).createAlarm(medicationName, dosageString + units);
         }
 
         private void generateApplicationsForDate(long medicationId, Calendar currDate,
@@ -289,25 +283,31 @@ public class CalendarActivity extends AppCompatActivity {
         mRecyclerViewMedications.setAdapter(mAdapter);
     }
 
-    private void showNotification(String title, String text) {
-        // Set the icon, scrolling text and timestamp
-        Notification notification = new Notification.Builder(getApplicationContext())
-                .setContentTitle(title)
-                .setContentText(text)
-                .setSmallIcon(R.drawable.pillpallogo)
-                .setChannelId("CAL_ACT_CH")
-                .build();
+    public static void showNotification(String title, String text, Context context, NotificationManager mNotificationManager) {
 
         // The PendingIntent to launch our activity if the user selects this
         // notification
         Intent MyIntent = new Intent(Intent.ACTION_VIEW);
-        PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(),0,MyIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, MyIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        // Set the icon, scrolling text and timestamp
+        Notification notification = new Notification.Builder(context)
+
+                .setPriority(Notification.PRIORITY_MAX)
+                .setVibrate(new long[0])
+                .setContentTitle(title)
+                .setContentText(text)
+                .setSmallIcon(R.drawable.pillpallogo)
+                .setChannelId("CAL_ACT_CH")
+                .setFullScreenIntent(contentIntent, true)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .build();
+
 
         // Set the info for the views that show in the notification panel.
         //notification.setLatestEventInfo(ctx, "Title", eventtext,
         //        contentIntent);
 
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Send the notification.
         mNotificationManager.notify("Title", 0, notification);
@@ -317,5 +317,24 @@ public class CalendarActivity extends AppCompatActivity {
         mAdapter.resetDataSet();
 
 //        showNotification(getApplicationContext());
+    }
+
+    public void createAlarm(String title, String text)
+    {
+        Context context = getApplicationContext();
+        AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra("title", title);
+        intent.putExtra("text", text);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+
+        alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + 2000,
+                5000, alarmIntent);
+//
+//        alarmMgr.setInexactRepeating(AlarmManager.RTC,
+//                System.currentTimeMillis() + 1000 * 5,
+//                1000 * 10, alarmIntent);
     }
 }
