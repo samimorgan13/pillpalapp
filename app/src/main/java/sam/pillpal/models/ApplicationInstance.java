@@ -20,7 +20,7 @@ public class ApplicationInstance {
         this.applicationDbHelper = this.databaseHelper.getApplicationDbHelper();
         this.id = id;
         this.medicationId = medicationId;
-        this.medication = this.applicationDbHelper.getApplication(this.medicationId);
+        //this.medication = this.applicationDbHelper.getApplication(this.medicationId);
         this.applicationDate = applicationDate;
     }
 

@@ -4,14 +4,22 @@ package sam.pillpal;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -205,6 +213,22 @@ public class CalendarActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private long curDate;
 
+    private void createNotificationChannel(String channel_name, String channel_description) {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = channel_name;
+            String description = channel_description;
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("CAL_ACT_CH", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -223,6 +247,8 @@ public class CalendarActivity extends AppCompatActivity {
         };
         mCalendarView.setOnDateChangeListener(list);
 
+        // create notification channel
+        createNotificationChannel("Medication Reminder", "Reminds you when you need to take some meds");
     }
 
     /**
@@ -261,8 +287,33 @@ public class CalendarActivity extends AppCompatActivity {
         mRecyclerViewMedications.setAdapter(mAdapter);
     }
 
-    public void refreshRecyclerInserted() {
-        mAdapter.resetDataSet();
+    private void showNotification(Context mContext) {
+        // Set the icon, scrolling text and timestamp
+        Notification notification = new Notification.Builder(mContext)
+                .setContentTitle("content title")
+                .setContentText("content text")
+                .setSmallIcon(R.drawable.pillpallogo)
+                .setChannelId("CAL_ACT_CH")
+                .build();
+
+        // The PendingIntent to launch our activity if the user selects this
+        // notification
+        Intent MyIntent = new Intent(Intent.ACTION_VIEW);
+        PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(),0,MyIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        // Set the info for the views that show in the notification panel.
+        //notification.setLatestEventInfo(ctx, "Title", eventtext,
+        //        contentIntent);
+
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Send the notification.
+        mNotificationManager.notify("Title", 0, notification);
     }
 
+    public void refreshRecyclerInserted() {
+        mAdapter.resetDataSet();
+
+        showNotification(getApplicationContext());
+    }
 }
