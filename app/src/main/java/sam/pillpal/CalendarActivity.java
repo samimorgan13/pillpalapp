@@ -75,6 +75,8 @@ public class CalendarActivity extends AppCompatActivity {
                     "test", cal.getTime());
             generateApplicationsForDate(id, Calendar.getInstance(), cal, (String)freqSpinner.getSelectedItem());
             ((CalendarActivity) getActivity()).refreshRecyclerInserted();
+
+            ((CalendarActivity) getActivity()).showNotification(medicationName, dosageString);
         }
 
         private void generateApplicationsForDate(long medicationId, Calendar currDate,
@@ -287,11 +289,11 @@ public class CalendarActivity extends AppCompatActivity {
         mRecyclerViewMedications.setAdapter(mAdapter);
     }
 
-    private void showNotification(Context mContext) {
+    private void showNotification(String title, String text) {
         // Set the icon, scrolling text and timestamp
-        Notification notification = new Notification.Builder(mContext)
-                .setContentTitle("content title")
-                .setContentText("content text")
+        Notification notification = new Notification.Builder(getApplicationContext())
+                .setContentTitle(title)
+                .setContentText(text)
                 .setSmallIcon(R.drawable.pillpallogo)
                 .setChannelId("CAL_ACT_CH")
                 .build();
@@ -314,6 +316,6 @@ public class CalendarActivity extends AppCompatActivity {
     public void refreshRecyclerInserted() {
         mAdapter.resetDataSet();
 
-        showNotification(getApplicationContext());
+//        showNotification(getApplicationContext());
     }
 }
