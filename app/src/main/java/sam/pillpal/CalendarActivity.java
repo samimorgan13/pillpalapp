@@ -67,7 +67,7 @@ public class CalendarActivity extends AppCompatActivity {
             long interval = 0;
             switch (freqString){
                 case "Secs":
-                    interval = 30000;
+                    interval = 10000;
                     break;
                 case "Hourly":
                     interval = AlarmManager.INTERVAL_HOUR;
@@ -79,7 +79,7 @@ public class CalendarActivity extends AppCompatActivity {
                     interval = AlarmManager.INTERVAL_DAY*7;
                     break;
                 default:
-                    interval = 30000;
+                    interval = 10000;
                     break;
             }
             cal.set(date.getYear() + 1900, date.getMonth(), date.getDate(), timePicker.getCurrentHour(),
