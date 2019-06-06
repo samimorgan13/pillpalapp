@@ -36,6 +36,7 @@
     <string name="cancel">Cancel</string>
     <string name="med_name">Medication Name</string>
     <string-array name="freq_array">
+        <item>Secs</item>
         <item>Hourly</item>
         <item>Daily</item>
         <item>Weekly</item>

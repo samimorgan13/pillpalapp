@@ -59,6 +59,25 @@ public class CalendarActivity extends AppCompatActivity {
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(this.originalDate);
             Date date = cal.getTime();
+            String freqString = this.freqSpinner.getSelectedItem().toString();
+            long interval = 0;
+            switch (freqString){
+                case "Secs":
+                    interval = 30000;
+                    break;
+                case "Hourly":
+                    interval = AlarmManager.INTERVAL_HOUR;
+                    break;
+                case "Daily":
+                    interval = AlarmManager.INTERVAL_DAY;
+                    break;
+                case "Weekly":
+                    interval = AlarmManager.INTERVAL_DAY*7;
+                    break;
+                default:
+                    interval = 30000;
+                    break;
+            }
             cal.set(date.getYear() + 1900, date.getMonth(), date.getDate(), timePicker.getCurrentHour(),
                     timePicker.getCurrentMinute());
             long id = databaseHelper.getMedicationDbHelper().insertMedication(medicationName, dosageString,
@@ -70,7 +89,7 @@ public class CalendarActivity extends AppCompatActivity {
             if (dosageNum != 1) units += "s";
 
 //            ((CalendarActivity) getActivity()).showNotification(medicationName, dosageString + units);
-            ((CalendarActivity) getActivity()).createAlarm(medicationName, dosageString + units, calcDateInMillis);
+            ((CalendarActivity) getActivity()).createAlarm(medicationName, dosageString + units, calcDateInMillis, interval);
         }
 
         private long generateApplicationsForDate(long medicationId, Calendar currDate,
@@ -321,7 +340,7 @@ public class CalendarActivity extends AppCompatActivity {
 //        showNotification(getApplicationContext());
     }
 
-    public void createAlarm(String title, String text, long time)
+    public void createAlarm(String title, String text, long time, long interval)
     {
         Context context = getApplicationContext();
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -333,6 +352,7 @@ public class CalendarActivity extends AppCompatActivity {
 
         long old_time = System.currentTimeMillis();
 
-        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, time,30000, alarmIntent);
+        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, time,interval, alarmIntent);
+
     }
 }
