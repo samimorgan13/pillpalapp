@@ -30,6 +30,9 @@ public class Medication {
          String strDate = dateFormat.format(this.refillDate);
         return strDate;
      }
+    public long getId() {
+        return this.id;
+    }
 }
 
 

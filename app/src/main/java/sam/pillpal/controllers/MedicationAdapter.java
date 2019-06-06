@@ -20,6 +20,10 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
     private List<Medication> mDataset;
     private Context mContext;
 
+    public long getMedicationIdAtPosition(int position) {
+        return this.mDataset.get(position).getId();
+    }
+
     @NonNull
     @Override
     public MedicationHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {

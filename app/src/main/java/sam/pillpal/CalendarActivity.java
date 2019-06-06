@@ -287,7 +287,9 @@ public class CalendarActivity extends AppCompatActivity {
             //Toast.makeText(ListActivity.this, "on Swiped ", Toast.LENGTH_SHORT).show();
             //Remove swiped item from list and notify the RecyclerView
             int position = viewHolder.getAdapterPosition();
+            long medId = mAdapter.getMedicationIdAtPosition(position);
             mAdapter.removeAtPosition(position);
+            databaseHelper.getMedicationDbHelper().deleteMedication(medId);
             //mAdapter.notifyItemRemoved(viewHolder.getLayoutPosition());
             //mAdapter.notifyItemRemoved(viewHolder.getLayoutPosition());
         }

@@ -95,5 +95,11 @@ public final class MedicationContract {
             values.put(MedicationRow.COLUMN_NAME_REFILL_DATE, refillDate.getTime());
             return db.insert(TABLE_NAME, null, values);
         }
+
+        public void deleteMedication(long medId) {
+            String[] args = new String[] {String.valueOf(medId)};
+            this.getWritableDatabase().delete(TABLE_NAME, MedicationRow._ID + " = ?",
+                    args);
+        }
     }
 }
