@@ -333,12 +333,6 @@ public class CalendarActivity extends AppCompatActivity {
 
         long old_time = System.currentTimeMillis();
 
-        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-                time,
-                5000, alarmIntent);
-//
-//        alarmMgr.setInexactRepeating(AlarmManager.RTC,
-//                System.currentTimeMillis() + 1000 * 5,
-//                1000 * 10, alarmIntent);
+        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, time,30000, alarmIntent);
     }
 }
