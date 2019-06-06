@@ -3,6 +3,7 @@ package sam.pillpal;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ListActivity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -22,6 +23,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -33,6 +35,8 @@ import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
+
 import sam.pillpal.controllers.MedicationAdapter;
 import sam.pillpal.models.DatabaseHelper;
 import java.util.Calendar;
@@ -266,8 +270,28 @@ public class CalendarActivity extends AppCompatActivity {
 
         // create notification channel
         createNotificationChannel("Medication Reminder", "Reminds you when you need to take some meds");
-    }
 
+
+
+    }
+    ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT | ItemTouchHelper.DOWN | ItemTouchHelper.UP) {
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            //Toast.makeText(ListActivity.this, "on Move", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+            //Toast.makeText(ListActivity.this, "on Swiped ", Toast.LENGTH_SHORT).show();
+            //Remove swiped item from list and notify the RecyclerView
+            int position = viewHolder.getAdapterPosition();
+            mAdapter.removeAtPosition(position);
+            //mAdapter.notifyItemRemoved(viewHolder.getLayoutPosition());
+            //mAdapter.notifyItemRemoved(viewHolder.getLayoutPosition());
+        }
+    };
     /**
      * This method is to initialize views
      */
@@ -293,6 +317,8 @@ public class CalendarActivity extends AppCompatActivity {
                 (fragment).show(fragmentManager, "addMedication");
             }
         });
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(mRecyclerViewMedications);
     }
 
     /**

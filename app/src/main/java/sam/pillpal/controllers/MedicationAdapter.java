@@ -42,6 +42,11 @@ public class MedicationAdapter extends RecyclerView.Adapter<MedicationAdapter.Me
         super.onAttachedToRecyclerView(recyclerView);
     }
 
+    public void removeAtPosition(int position) {
+        this.mDataset.remove(position);
+        this.notifyDataSetChanged();
+    }
+
     static class MedicationHolder extends RecyclerView.ViewHolder {
         CardView mMedicationCard;
         TextView mNameTextView;
